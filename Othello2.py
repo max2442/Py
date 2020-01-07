@@ -552,7 +552,7 @@ def reproduce(parent1,parent2):
         lis.append(oth)
     return lis
 
-def evolve():
+def evolve(b):
     player_list = []
     born_players =[]
     born_players2 =[]
@@ -565,7 +565,7 @@ def evolve():
         #print(io.fitness)
         player_list.append((io.fitness+io.fitness2,io.fitness,io.fitness2,random.random(),io))
     #print()
-    while num<5:
+    while num<b:
         print(num)
         player_list = sorted(player_list,reverse=True)
         print(player_list[0][1])
