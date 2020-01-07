@@ -606,4 +606,4 @@ def evolve(b):
     print(player_list[0][4].bias2)
     print(player_list[0][4].bias3)
 
-evolve(sys.argv[1])
+evolve(int(sys.argv[1]))
