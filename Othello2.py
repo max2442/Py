@@ -585,7 +585,7 @@ class Play:
             x.start()
             x.join()
 
-    def evolve(self):
+    def evolve(self,b):
         player_list = []
         born_players =[]
         born_players2 =[]
@@ -598,7 +598,7 @@ class Play:
             #print(io.fitness)
             player_list.append((io.fitness+io.fitness2,io.fitness,io.fitness2,random.random(),io))
         #print()
-        while num<8:
+        while num<b:
             print(num)
             player_list = sorted(player_list,reverse=True)
             #print(player_list)
@@ -647,4 +647,4 @@ class Play:
         # print(player_list[0][4].bias3)
 
 p = Play()
-p.evolve()
+p.evolve(int(sys.argv[1]))
