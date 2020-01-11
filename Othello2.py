@@ -1,7 +1,8 @@
 import time
-#import numpy as np
+import numpy as np
 import math
 import random
+import threading
 import sys
 
 class Othello_Player:
@@ -355,9 +356,9 @@ class Othello_Player:
             count = 0
             temp = self.available_moves(self.string_rep, open_spaces, p1spaces, p2spaces, 2)
             if len(temp.keys()) != 0:
-                second1 = self.sigmoid(self.add_matrix(self.multiply_matrix(self.number_rep, self.weight1),self.bias1), False)
-                third1 = self.sigmoid(self.add_matrix(self.multiply_matrix(second1, self.weight2),self.bias2), False)
-                final1 = self.sigmoid(self.add_matrix(self.multiply_matrix(third1, self.weight3),self.bias3), False)
+                second1 = self.sigmoid(np.add(np.dot(self.number_rep, self.weight1),self.bias1), False)
+                third1 = self.sigmoid(np.add(np.dot(second1, self.weight2),self.bias2), False)
+                final1 = self.sigmoid(np.add(np.dot(third1, self.weight3),self.bias3), False)
                 play_position = self.get_best_spot(final1,temp.keys())
                 # while final1.index(max(final1)) not in temp.keys():
                 #     final1[final1.index(max(final1))] = -1
@@ -429,9 +430,9 @@ class Othello_Player:
             if "." in self.string_rep:
                 temp = self.available_moves(self.string_rep, open_spaces, p1spaces, p2spaces, 1)
                 if len(temp.keys()) != 0:
-                    second1 = self.sigmoid(self.add_matrix(self.multiply_matrix(self.number_rep, self.weight1),self.bias1), False)
-                    third1 = self.sigmoid(self.add_matrix(self.multiply_matrix(second1, self.weight2),self.bias2), False)
-                    final1 = self.sigmoid(self.add_matrix(self.multiply_matrix(third1, self.weight3),self.bias3), False)
+                    second1 = self.sigmoid(np.add(np.dot(self.number_rep, self.weight1),self.bias1), False)
+                    third1 = self.sigmoid(np.add(np.dot(second1, self.weight2),self.bias2), False)
+                    final1 = self.sigmoid(np.add(np.dot(third1, self.weight3),self.bias3), False)
                     play_position = self.get_best_spot(final1, temp.keys())
                     # while final1.index(max(final1)) not in temp.keys():
                     #     final1[final1.index(max(final1))] = -1
@@ -487,123 +488,163 @@ class Othello_Player:
         self.fitness = len(p1spaces)
         return self.fitness
 
-def make_random3(size):
-    temp = []
-    lis = []
-    for c in range(size):
-        for g in range(size):
-            lis.append(random.random())
-        temp.append(lis)
+class Play:
+    g_list = []
+    sim_list = []
+    def make_random3(self,size):
+        temp = []
         lis = []
-    return temp
+        for c in range(size):
+            for g in range(size):
+                lis.append(random.random())
+            temp.append(lis)
+            lis = []
+        return temp
 
-def make_random4(size):
-    temp = []
-    for c in range(size):
-        temp.append(random.random())
-    return temp
+    def make_random4(self,size):
+        temp = []
+        for c in range(size):
+            temp.append(random.random())
+        return temp
 
-def reproduce(parent1,parent2):
-    lis = []
-    for c in range(8):
-        temp = make_random3(100)
-        temp2 = make_random3(100)
-        temp3 = make_random3(100)
-        temp11 = make_random4(100)
-        temp22 = make_random4(100)
-        temp33 = make_random4(100)
-        for g in range(100):
-            for h in range(100):
+    def reproduce(self,parent1,parent2):
+            lis = []
+        #for c in range(8):
+            temp = self.make_random3(100)
+            temp2 = self.make_random3(100)
+            temp3 = self.make_random3(100)
+            temp11 = self.make_random4(100)
+            temp22 = self.make_random4(100)
+            temp33 = self.make_random4(100)
+            for g in range(100):
+                for h in range(100):
+                    n = random.randint(0,2)
+                    nn = random.random()
+                    if nn<.6:
+                        if n==0:
+                            temp[g][h] = parent1.weight1[g][h]
+                            temp2[g][h] = parent1.weight2[g][h]
+                            temp3[g][h] = parent1.weight3[g][h]
+
+                        elif n==1:
+                            temp[g][h] = parent2.weight1[g][h]
+                            temp2[g][h] = parent2.weight2[g][h]
+                            temp3[g][h] = parent2.weight3[g][h]
+                        else:
+                            temp[g][h] = (parent1.weight1[g][h]+parent2.weight1[g][h])/2
+                            temp2[g][h] = (parent1.weight2[g][h] + parent2.weight2[g][h])/2
+                            temp3[g][h] = (parent1.weight3[g][h] + parent2.weight3[g][h])/2
+                    else:
+                        temp[g][h] = random.random()
+                        temp2[g][h] = random.random()
+                        temp3[g][h] = random.random()
                 n = random.randint(0,2)
-                if n==0:
-                    temp[g][h] = parent1.weight1[g][h]
-                    temp2[g][h] = parent1.weight2[g][h]
-                    temp3[g][h] = parent1.weight3[g][h]
+                if n == 0:
+                    temp11[g] = parent1.bias1[g]
+                    temp22[g] = parent1.bias2[g]
+                    temp33[g] = parent1.bias3[g]
 
-                elif n==1:
-                    temp[g][h] = parent2.weight1[g][h]
-                    temp2[g][h] = parent2.weight2[g][h]
-                    temp3[g][h] = parent2.weight3[g][h]
+                elif n == 1:
+                    temp11[g] = parent2.bias1[g]
+                    temp22[g] = parent2.bias2[g]
+                    temp33[g] = parent2.bias3[g]
                 else:
-                    temp[g][h] = (parent1.weight1[g][h]+parent2.weight1[g][h])/2
-                    temp2[g][h] = (parent1.weight2[g][h] + parent2.weight2[g][h])/2
-                    temp3[g][h] = (parent1.weight3[g][h] + parent2.weight3[g][h])/2
-            n = random.randint(0,2)
-            if n == 0:
-                temp11[g] = parent1.bias1[g]
-                temp22[g] = parent1.bias2[g]
-                temp33[g] = parent1.bias3[g]
+                    temp11[g] = (parent1.bias1[g] + parent2.bias1[g]) / 2
+                    temp22[g] = (parent1.bias2[g] + parent2.bias2[g]) / 2
+                    temp33[g] = (parent1.bias3[g] + parent2.bias3[g]) / 2
+            oth = Othello_Player()
+            oth.weight1 = temp
+            oth.weight2 = temp2
+            oth.weight3 = temp3
+            oth.bias1 = temp11
+            oth.bias2 = temp22
+            oth.bias3 = temp33
+            self.g_list.append(oth)
+            #lis.append(oth)
+            #return lis
 
-            elif n == 1:
-                temp11[g] = parent2.bias1[g]
-                temp22[g] = parent2.bias2[g]
-                temp33[g] = parent2.bias3[g]
-            else:
-                temp11[g] = (parent1.bias1[g] + parent2.bias1[g]) / 2
-                temp22[g] = (parent1.bias2[g] + parent2.bias2[g]) / 2
-                temp33[g] = (parent1.bias3[g] + parent2.bias3[g]) / 2
-        oth = Othello_Player()
-        oth.weight1 = temp
-        oth.weight2 = temp2
-        oth.weight3 = temp3
-        oth.bias1 = temp11
-        oth.bias2 = temp22
-        oth.bias3 = temp33
-        lis.append(oth)
-    return lis
+    def thread_reproduce(self,parent1,parent2):
+        threads = list()
+        for index in range(8):
+            x = threading.Thread(target=self.reproduce, args=(parent1,parent2))
+            threads.append(x)
+            x.start()
+            x.join()
 
-def evolve(b):
-    player_list = []
-    born_players =[]
-    born_players2 =[]
-    num = 0
-    save = None
-    for c in range(50):
-        io = Othello_Player()
-        io.simulate()
-        io.simulate3()
-        #print(io.fitness)
-        player_list.append((io.fitness+io.fitness2,io.fitness,io.fitness2,random.random(),io))
-    #print()
-    while num<b:
-        print(num)
-        player_list = sorted(player_list,reverse=True)
-        print(player_list[0][1])
-        print(player_list[0][2])
-        #if (num+1)%20 ==0:
-            #save=player_list[0][2]
-        for g in range(0,10,2):
-            born_players2.append(player_list[g][4])
-            born_players2.append(player_list[g+1][4])
-            born_players = reproduce(player_list[g][4],player_list[g+1][4])
-            for h in born_players:
-                born_players2.append(h)
+    def multi_simulation(self,oth):
+        oth.simulate()
+        oth.simulate3()
+        self.sim_list.append((oth.fitness + oth.fitness2, oth.fitness, oth.fitness2, random.random(), oth))
+
+    def thread_simulation(self,born_players):
+        threads = list()
+        for index in born_players:
+            #self.multi_simulation(index)
+            x = threading.Thread(target=self.multi_simulation, args=(index,))
+            threads.append(x)
+            x.start()
+            x.join()
+
+    def evolve(self):
         player_list = []
-        player_list.append((born_players2[0].fitness+born_players2[0].fitness2,born_players2[0].fitness,born_players2[0].fitness2,random.random(),born_players2[0]))
-        player_list.append((born_players2[1].fitness + born_players2[1].fitness2, born_players2[1].fitness,born_players2[1].fitness2, random.random(), born_players2[1]))
-        born_players2.remove(born_players2[1])
-        born_players2.remove(born_players2[0])
-        for h in born_players2:
-            if save ==None:
-                h.simulate()
-                h.simulate3()
-            else:
-                h.simulate2(save)
-            #print(h.fitness,end=" ")
-            #print(h.fitness2)
-            player_list.append((h.fitness+h.fitness2,h.fitness,h.fitness2,random.random(),h))
-        print()
-        # if (num+1)%10==0:
-        #     print("New Village Head")
-        num+=1
-    player_list = sorted(player_list, reverse=True)
-    # print(player_list[0][1])
-    # print(player_list[0][2])
-    print(player_list[0][4].weight1)
-    print(player_list[0][4].weight2)
-    print(player_list[0][4].weight3)
-    print(player_list[0][4].bias1)
-    print(player_list[0][4].bias2)
-    print(player_list[0][4].bias3)
+        born_players =[]
+        born_players2 =[]
+        num = 0
+        save = None
+        for c in range(50):
+            io = Othello_Player()
+            io.simulate()
+            io.simulate3()
+            #print(io.fitness)
+            player_list.append((io.fitness+io.fitness2,io.fitness,io.fitness2,random.random(),io))
+        #print()
+        while num<8:
+            print(num)
+            player_list = sorted(player_list,reverse=True)
+            #print(player_list)
+            print(player_list[0][1])
+            print(player_list[0][2])
+            #if (num+1)%20 ==0:
+                #save=player_list[0][2]
+            for g in range(0,10,2):
+                self.g_list=[]
+                born_players2.append(player_list[g][4])
+                born_players2.append(player_list[g+1][4])
+                self.thread_reproduce(player_list[g][4],player_list[g+1][4])
+                born_players = self.g_list#reproduce(player_list[g][4],player_list[g+1][4])
+                for h in born_players:
+                    born_players2.append(h)
+            player_list = []
+            player_list.append((born_players2[0].fitness+born_players2[0].fitness2,born_players2[0].fitness,born_players2[0].fitness2,random.random(),born_players2[0]))
+            player_list.append((born_players2[1].fitness + born_players2[1].fitness2, born_players2[1].fitness,born_players2[1].fitness2, random.random(), born_players2[1]))
+            born_players2.remove(born_players2[1])
+            born_players2.remove(born_players2[0])
+            self.thread_simulation(born_players2)
+            # for h in born_players2:
+            #     if save ==None:
+            #         h.simulate()
+            #         h.simulate3()
+            #     else:
+            #         h.simulate2(save)
+            #     #print(h.fitness,end=" ")
+            #     #print(h.fitness2)
+            #     player_list.append((h.fitness+h.fitness2,h.fitness,h.fitness2,random.random(),h))
+            player_list = self.sim_list
+            #print(player_list[0])
+            self.sim_list =[]
+            print()
+            # if (num+1)%10==0:
+            #     print("New Village Head")
+            num+=1
+        player_list = sorted(player_list, reverse=True)
+        # print(player_list[0][1])
+        # print(player_list[0][2])
+        # print(player_list[0][4].weight1)
+        # print(player_list[0][4].weight2)
+        # print(player_list[0][4].weight3)
+        # print(player_list[0][4].bias1)
+        # print(player_list[0][4].bias2)
+        # print(player_list[0][4].bias3)
 
-evolve(int(sys.argv[1]))
+p = Play()
+p.evolve()
