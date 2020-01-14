@@ -612,14 +612,15 @@ class Play:
                 born_players2.append(player_list[g][4])
                 born_players2.append(player_list[g+1][4])
                 self.thread_reproduce(player_list[g][4],player_list[g+1][4])
+                print(self.g_list)
                 born_players = self.g_list#reproduce(player_list[g][4],player_list[g+1][4])
                 for h in born_players:
                     born_players2.append(h)
             player_list = []
-            player_list.append((born_players2[0].fitness+born_players2[0].fitness2,born_players2[0].fitness,born_players2[0].fitness2,random.random(),born_players2[0]))
-            player_list.append((born_players2[1].fitness + born_players2[1].fitness2, born_players2[1].fitness,born_players2[1].fitness2, random.random(), born_players2[1]))
-            born_players2.remove(born_players2[1])
-            born_players2.remove(born_players2[0])
+#             player_list.append((born_players2[0].fitness+born_players2[0].fitness2,born_players2[0].fitness,born_players2[0].fitness2,random.random(),born_players2[0]))
+#             player_list.append((born_players2[1].fitness + born_players2[1].fitness2, born_players2[1].fitness,born_players2[1].fitness2, random.random(), born_players2[1]))
+#             born_players2.remove(born_players2[1])
+#             born_players2.remove(born_players2[0])
             self.thread_simulation(born_players2)
             # for h in born_players2:
             #     if save ==None:
@@ -633,7 +634,6 @@ class Play:
             player_list = self.sim_list
             #print(player_list[0])
             self.sim_list =[]
-            print()
             # if (num+1)%10==0:
             #     print("New Village Head")
             num+=1
