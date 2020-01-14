@@ -615,6 +615,7 @@ class Play:
                 born_players = self.g_list#reproduce(player_list[g][4],player_list[g+1][4])
                 for h in born_players:
                     born_players2.append(h)
+            print(len(born_players2))
             self.g_list=[]
             player_list = []
 #             player_list.append((born_players2[0].fitness+born_players2[0].fitness2,born_players2[0].fitness,born_players2[0].fitness2,random.random(),born_players2[0]))
@@ -637,10 +638,10 @@ class Play:
             # if (num+1)%10==0:
             #     print("New Village Head")
             num+=1
-            print(len(player_list))
+            #print(len(player_list))
             print()
-            en = time.perf_counter()
-            print(en - t)
+            #en = time.perf_counter()
+            #print(en - t)
         player_list = sorted(player_list, reverse=True)
         print(player_list[0][1])
         print(player_list[0][2])
