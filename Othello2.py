@@ -623,6 +623,7 @@ class Play:
 #             born_players2.remove(born_players2[1])
 #             born_players2.remove(born_players2[0])
             self.thread_simulation(born_players2)
+            born_players2 = []
             # for h in born_players2:
             #     if save ==None:
             #         h.simulate()
