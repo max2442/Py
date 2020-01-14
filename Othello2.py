@@ -599,6 +599,7 @@ class Play:
             player_list.append((io.fitness+io.fitness2,io.fitness,io.fitness2,random.random(),io))
         #print()
         while num<b:
+            t = time.perf_counter()
             print(num)
             player_list = sorted(player_list,reverse=True)
             #print(player_list)
@@ -636,6 +637,10 @@ class Play:
             # if (num+1)%10==0:
             #     print("New Village Head")
             num+=1
+            print(len(player_list))
+            print()
+            en = time.perf_counter()
+            print(en - t)
         player_list = sorted(player_list, reverse=True)
         print(player_list[0][1])
         print(player_list[0][2])
