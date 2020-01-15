@@ -645,6 +645,7 @@ class Play:
             self.battle(battle_players)
             self.thread_simulation(born_players2)
             born_players2 = []
+            battle_players = []
             # for h in born_players2:
             #     if save ==None:
             #         h.simulate()
@@ -667,14 +668,14 @@ class Play:
             # print(en - t)
         player_list = sorted(player_list, reverse=True)
         sample = open('weightfile.txt', 'w')
-        print(player_list[0][1], file=sample)
         print(player_list[0][2], file=sample)
-        print(player_list[0][4].weight1, file=sample)
-        print(player_list[0][4].weight2, file=sample)
-        print(player_list[0][4].weight3, file=sample)
-        print(player_list[0][4].bias1, file=sample)
-        print(player_list[0][4].bias2, file=sample)
-        print(player_list[0][4].bias3, file=sample)
+        print(player_list[0][3], file=sample)
+        print(player_list[0][5].weight1, file=sample)
+        print(player_list[0][5].weight2, file=sample)
+        print(player_list[0][5].weight3, file=sample)
+        print(player_list[0][5].bias1, file=sample)
+        print(player_list[0][5].bias2, file=sample)
+        print(player_list[0][5].bias3, file=sample)
         sample.close()
 
 
