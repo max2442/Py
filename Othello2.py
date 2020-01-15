@@ -507,7 +507,7 @@ class Play:
             temp.append(random.random())
         return temp
 
-    def reproduce(self,parent1,parent2):
+    def reproduce(self,parent1,parent2,mutation):
             lis = []
         #for c in range(8):
             temp = self.make_random3(100)
@@ -520,7 +520,7 @@ class Play:
                 for h in range(100):
                     n = random.randint(0,2)
                     nn = random.random()
-                    if nn<.6:
+                    if nn<mutation:
                         if n==0:
                             temp[g][h] = parent1.weight1[g][h]
                             temp2[g][h] = parent1.weight2[g][h]
@@ -563,10 +563,10 @@ class Play:
             #lis.append(oth)
             #return lis
 
-    def thread_reproduce(self,parent1,parent2):
+    def thread_reproduce(self,parent1,parent2,mutation):
         threads = list()
         for index in range(8):
-            x = threading.Thread(target=self.reproduce, args=(parent1,parent2))
+            x = threading.Thread(target=self.reproduce, args=(parent1,parent2,mutation))
             threads.append(x)
             x.start()
             x.join()
@@ -589,6 +589,9 @@ class Play:
         player_list = []
         born_players =[]
         born_players2 =[]
+        previous_value=0
+        count_in_a_row = 0
+        mutation = .8
         num = 0
         save = None
         for c in range(50):
@@ -597,11 +600,20 @@ class Play:
             io.simulate3()
             #print(io.fitness)
             player_list.append((io.fitness+io.fitness2,io.fitness,io.fitness2,random.random(),io))
+        previous_value = player_list[0][0]
         #print()
         while num<b:
             t = time.perf_counter()
             print(num)
             player_list = sorted(player_list,reverse=True)
+            if previous_value==player_list[0][0]:
+                count_in_a_row+=1
+            else:
+                count_in_a_row=0
+                mutation=.8
+                previous_value=player_list[0][0]
+            if count_in_a_row>=10:
+                mutation = .4
             #print(player_list)
             print(player_list[0][1])
             print(player_list[0][2])
@@ -611,7 +623,7 @@ class Play:
                 self.g_list=[]
                 born_players2.append(player_list[g][4])
                 born_players2.append(player_list[g+1][4])
-                self.thread_reproduce(player_list[g][4],player_list[g+1][4])
+                self.thread_reproduce(player_list[g][4],player_list[g+1][4],mutation)
                 born_players = self.g_list#reproduce(player_list[g][4],player_list[g+1][4])
                 for h in born_players:
                     born_players2.append(h)
@@ -644,14 +656,16 @@ class Play:
             #en = time.perf_counter()
             #print(en - t)
         player_list = sorted(player_list, reverse=True)
-        print(player_list[0][1])
-        print(player_list[0][2])
-        print(player_list[0][4].weight1)
-        print(player_list[0][4].weight2)
-        print(player_list[0][4].weight3)
-        print(player_list[0][4].bias1)
-        print(player_list[0][4].bias2)
-        print(player_list[0][4].bias3)
+        sample = open('weightfile.txt', 'w')
+        print(player_list[0][1], file = sample)
+        print(player_list[0][2], file = sample)
+        print(player_list[0][4].weight1, file = sample)
+        print(player_list[0][4].weight2, file = sample)
+        print(player_list[0][4].weight3, file = sample)
+        print(player_list[0][4].bias1, file = sample)
+        print(player_list[0][4].bias2, file = sample)
+        print(player_list[0][4].bias3, file = sample)
+        sample.close()
 
 p = Play()
 p.evolve(int(sys.argv[1]))
