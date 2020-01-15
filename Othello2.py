@@ -613,7 +613,7 @@ class Play:
                 mutation=.8
                 previous_value=player_list[0][0]
             if count_in_a_row>=10:
-                mutation = .4
+                mutation = .3
             #print(player_list)
             print(player_list[0][1])
             print(player_list[0][2])
