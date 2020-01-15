@@ -16,6 +16,7 @@ class Othello_Player:
     bias3 = None
     fitness = None
     fitness2=None
+    battle_fitness = 0
 
     def make_random(self,size):
         temp = []
@@ -455,14 +456,13 @@ class Othello_Player:
             count = 0
             temp = self.available_moves(self.string_rep, open_spaces, p1spaces, p2spaces, 2)
             if len(temp.keys()) != 0:
-                second1 = self.sigmoid(self.add_matrix(self.multiply_matrix(self.number_rep, self.weight1),self.bias1),False)
-                third1 = self.sigmoid(self.add_matrix(self.multiply_matrix(second1, self.weight2),self.bias2), False)
-                final1 = self.sigmoid(self.add_matrix(self.multiply_matrix(third1, self.weight3),self.bias3), False)
-                while final1.index(max(final1)) not in temp.keys():
-                    final1[final1.index(max(final1))] = -1
-                self.string_rep[final1.index(max(final1))] = "@"
-                self.number_rep[final1.index(max(final1))] = 1
-                for c in temp.get(final1.index(max(final1))):
+                second1 = self.sigmoid(np.add(np.dot(self.number_rep, self.weight1), self.bias1), False)
+                third1 = self.sigmoid(np.add(np.dot(second1, self.weight2), self.bias2), False)
+                final1 = self.sigmoid(np.add(np.dot(third1, self.weight3), self.bias3), False)
+                play_position = self.get_best_spot(final1, temp.keys())
+                self.string_rep[play_position] = "@"
+                self.number_rep[play_position] = 1
+                for c in temp.get(play_position):
                     self.number_rep[c] = 1
                     self.string_rep[c] = "@"
                 open_spaces, p1spaces, p2spaces = self.make_board(self.string_rep)
@@ -471,22 +471,24 @@ class Othello_Player:
             if "." in self.string_rep:
                 temp = self.available_moves(self.string_rep, open_spaces, p1spaces, p2spaces, 1)
                 if len(temp.keys()) != 0:
-                    second2 = self.sigmoid(self.multiply_matrix(self.number_rep, othello_player.weight1), False)
-                    third2 = self.sigmoid(self.multiply_matrix(second2, othello_player.weight2), False)
-                    final2 = self.sigmoid(self.multiply_matrix(third2, othello_player.weight3), False)
-                    while final2.index(max(final2)) not in temp.keys():
-                        final2[final2.index(max(final2))] = -1
-                    self.string_rep[final2.index(max(final2))] = "o"
-                    self.number_rep[final2.index(max(final2))] = 2
-                    for c in temp.get(final2.index(max(final2))):
+                    second2 = self.sigmoid(np.add(np.dot(self.number_rep, othello_player.weight1), othello_player.bias1), False)
+                    third2 = self.sigmoid(np.add(np.dot(second2, othello_player.weight2), othello_player.bias2), False)
+                    final2 = self.sigmoid(np.add(np.dot(third2, othello_player.weight3), othello_player.bias3), False)
+                    play_position = self.get_best_spot(final2, temp.keys())
+                    self.string_rep[play_position] = "o"
+                    self.number_rep[play_position] = 2
+                    for c in temp.get(play_position):
                         self.number_rep[c] = 2
                         self.string_rep[c] = "o"
                     open_spaces, p1spaces, p2spaces = self.make_board(self.string_rep)
                 else:
                     count += 1
         open_spaces, p1spaces, p2spaces = self.make_board(self.string_rep)
-        self.fitness = len(p1spaces)
-        return self.fitness
+        if len(p1spaces)>len(p2spaces):
+            self.battle_fitness +=1
+        else:
+            othello_player.battle_fitness+=1
+        return self.battle_fitness
 
 class Play:
     g_list = []
@@ -574,7 +576,7 @@ class Play:
     def multi_simulation(self,oth):
         oth.simulate()
         oth.simulate3()
-        self.sim_list.append((oth.fitness + oth.fitness2, oth.fitness, oth.fitness2, random.random(), oth))
+        self.sim_list.append((oth.fitness + oth.fitness2,oth.battle_fitness, oth.fitness, oth.fitness2, random.random(), oth))
 
     def thread_simulation(self,born_players):
         threads = list()
@@ -585,13 +587,21 @@ class Play:
             x.start()
             x.join()
 
+    def battle(self,battle_players):
+        for u in battle_players:
+            u.battle_fitness=0
+        for h in battle_players:
+            for k in battle_players:
+                h.simulate2(k)
+
     def evolve(self,b):
         player_list = []
         born_players =[]
         born_players2 =[]
-        previous_value=0
+        previous_value = 0
         count_in_a_row = 0
         mutation = .8
+        battle_players = []
         num = 0
         save = None
         for c in range(50):
@@ -599,41 +609,40 @@ class Play:
             io.simulate()
             io.simulate3()
             #print(io.fitness)
-            player_list.append((io.fitness+io.fitness2,io.fitness,io.fitness2,random.random(),io))
+            player_list.append((io.fitness+io.fitness2,random.random(),io.fitness,io.fitness2,random.random(),io))
         previous_value = player_list[0][0]
         #print()
         while num<b:
             t = time.perf_counter()
             print(num)
             player_list = sorted(player_list,reverse=True)
-            if previous_value==player_list[0][0]:
-                count_in_a_row+=1
+            if previous_value == player_list[0][0]:
+                count_in_a_row += 1
             else:
-                count_in_a_row=0
-                mutation=.8
-                previous_value=player_list[0][0]
-            if count_in_a_row>=10:
+                count_in_a_row = 0
+                mutation = .8
+                previous_value = player_list[0][0]
+            if count_in_a_row >= 10:
                 mutation = .3
             #print(player_list)
-            print(player_list[0][1])
             print(player_list[0][2])
+            print(player_list[0][3])
             #if (num+1)%20 ==0:
                 #save=player_list[0][2]
             for g in range(0,10,2):
+                battle_players.append(player_list[g][5])
+                battle_players.append(player_list[g+1][5])
                 self.g_list=[]
-                born_players2.append(player_list[g][4])
-                born_players2.append(player_list[g+1][4])
-                self.thread_reproduce(player_list[g][4],player_list[g+1][4],mutation)
+                born_players2.append(player_list[g][5])
+                born_players2.append(player_list[g+1][5])
+                self.thread_reproduce(player_list[g][5],player_list[g+1][5],mutation)
                 born_players = self.g_list#reproduce(player_list[g][4],player_list[g+1][4])
                 for h in born_players:
                     born_players2.append(h)
-            print(len(born_players2))
-            self.g_list=[]
+                    battle_players.append(h)
             player_list = []
-#             player_list.append((born_players2[0].fitness+born_players2[0].fitness2,born_players2[0].fitness,born_players2[0].fitness2,random.random(),born_players2[0]))
-#             player_list.append((born_players2[1].fitness + born_players2[1].fitness2, born_players2[1].fitness,born_players2[1].fitness2, random.random(), born_players2[1]))
-#             born_players2.remove(born_players2[1])
-#             born_players2.remove(born_players2[0])
+            self.g_list = []
+            self.battle(battle_players)
             self.thread_simulation(born_players2)
             born_players2 = []
             # for h in born_players2:
@@ -648,24 +657,27 @@ class Play:
             player_list = self.sim_list
             #print(player_list[0])
             self.sim_list =[]
+            # print()
             # if (num+1)%10==0:
             #     print("New Village Head")
             num+=1
-            #print(len(player_list))
+            # print(len(player_list))
             print()
-            #en = time.perf_counter()
-            #print(en - t)
+            # en = time.perf_counter()
+            # print(en - t)
         player_list = sorted(player_list, reverse=True)
         sample = open('weightfile.txt', 'w')
-        print(player_list[0][1], file = sample)
-        print(player_list[0][2], file = sample)
-        print(player_list[0][4].weight1, file = sample)
-        print(player_list[0][4].weight2, file = sample)
-        print(player_list[0][4].weight3, file = sample)
-        print(player_list[0][4].bias1, file = sample)
-        print(player_list[0][4].bias2, file = sample)
-        print(player_list[0][4].bias3, file = sample)
+        print(player_list[0][1], file=sample)
+        print(player_list[0][2], file=sample)
+        print(player_list[0][4].weight1, file=sample)
+        print(player_list[0][4].weight2, file=sample)
+        print(player_list[0][4].weight3, file=sample)
+        print(player_list[0][4].bias1, file=sample)
+        print(player_list[0][4].bias2, file=sample)
+        print(player_list[0][4].bias3, file=sample)
         sample.close()
+
 
 p = Play()
 p.evolve(int(sys.argv[1]))
+#563.0155633169998
