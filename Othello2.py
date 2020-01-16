@@ -618,6 +618,19 @@ class Play:
 #     def multi_battle2(self,player1,player2):
 #         player1.simulate2(player2)
     
+    def print_weights(self,player_list):
+        sample = open('weightfile.txt', 'w')
+        print(player_list[0][2], file=sample)
+        print(player_list[0][3], file=sample)
+        print(player_list[0][1], file=sample)
+        print(player_list[0][5].weight1, file=sample)
+        print(player_list[0][5].weight2, file=sample)
+        print(player_list[0][5].weight3, file=sample)
+        print(player_list[0][5].bias1, file=sample)
+        print(player_list[0][5].bias2, file=sample)
+        print(player_list[0][5].bias3, file=sample)
+        print("\n",file=sample)
+    
     def evolve(self,b):
         player_list = []
         born_players =[]
@@ -640,6 +653,8 @@ class Play:
 #             t = time.perf_counter()
             print(num)
             player_list = sorted(player_list,reverse=True)
+            if (num+1)%30==0:
+                print_weights(player_list)
             if previous_value == player_list[0][0]:
                 count_in_a_row += 1
             else:
@@ -695,15 +710,7 @@ class Play:
             # en = time.perf_counter()
             # print(en - t)
         player_list = sorted(player_list, reverse=True)
-        sample = open('weightfile.txt', 'w')
-        print(player_list[0][2], file=sample)
-        print(player_list[0][3], file=sample)
-        print(player_list[0][5].weight1, file=sample)
-        print(player_list[0][5].weight2, file=sample)
-        print(player_list[0][5].weight3, file=sample)
-        print(player_list[0][5].bias1, file=sample)
-        print(player_list[0][5].bias2, file=sample)
-        print(player_list[0][5].bias3, file=sample)
+        print_weights(player_list)
         sample.close()
 
 
