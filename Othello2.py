@@ -596,14 +596,20 @@ class Play:
             x.start()
             x.join()
 
-    def battle(self,battle_players):
+    def battle(self,player,battle_players):
+        for k in battle_players:
+            player.simulate2(k)
+
+    def multi_battle(self,battle_players):
+        threads = list()
         for u in battle_players:
             u.battle_fitness=0
-            print(u.battle_fitness)
-        for h in battle_players:
-            for k in battle_players:
-                h.simulate2(k)
-
+        for index in battle_players:
+            x = threading.Thread(target=self.battle, args=(index,battle_players))
+            threads.append(x)
+            x.start()
+            x.join()
+                
     def evolve(self,b):
         player_list = []
         born_players =[]
@@ -652,7 +658,7 @@ class Play:
                     battle_players.append(h)
             player_list = []
             self.g_list = []
-            self.battle(battle_players)
+            self.multi_battle(battle_players)
             self.thread_simulation(born_players2)
             born_players2 = []
             battle_players = []
