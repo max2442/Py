@@ -637,7 +637,7 @@ class Play:
         previous_value = player_list[0][0]
         #print()
         while num<b:
-            t = time.perf_counter()
+#             t = time.perf_counter()
             print(num)
             player_list = sorted(player_list,reverse=True)
             if previous_value == player_list[0][0]:
@@ -667,10 +667,10 @@ class Play:
                     battle_players.append(h)
             player_list = []
             self.g_list = []
-            t = time.perf_counter()
+#             t = time.perf_counter()
             self.multi_battle(battle_players)
-            end = time.perf_counter()
-            print(end-t)
+#             end = time.perf_counter()
+#             print(end-t)
             self.thread_simulation(born_players2)
             born_players2 = []
             battle_players = []
