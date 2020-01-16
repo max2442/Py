@@ -451,6 +451,15 @@ class Othello_Player:
 
     def simulate2(self,othello_player):
         count = 0
+        self.string_rep = ["?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", ".", ".", ".", ".", ".", ".", ".",
+                           ".", "?", "?",".", ".", ".", ".", ".", ".", ".", ".", "?", "?", ".", ".", ".", ".", ".", ".", ".", ".",
+                           "?", "?", ".",".", ".", "o", "@", ".", ".", ".", "?", "?", ".", ".", ".", "@",
+                           "o", ".", ".", ".", "?", "?", ".", ".", ".", ".", ".", ".", ".", ".", "?", "?", ".", ".",".", ".", ".",
+                           ".", ".", ".", "?", "?", ".", ".", ".", ".", ".", ".", ".", ".", "?", "?", "?", "?", "?","?", "?", "?","?", "?", "?"]
+        self.number_rep = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0, 0,0, 0, -1,
+                           -1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, 0, 0, 0, 2, 1, 0, 0, 0, -1, -1, 0, 0, 0, 1, 2, 0, 0, 0,-1, -1, 0,
+                           0, 0, 0, 0, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1,
+                           -1, -1,-1, -1, -1, -1, -1, -1, -1]
         open_spaces, p1spaces, p2spaces = self.make_board(self.string_rep)
         while "o" in self.string_rep and "@" in self.string_rep and "." in self.string_rep and count < 2:
             count = 0
@@ -590,6 +599,7 @@ class Play:
     def battle(self,battle_players):
         for u in battle_players:
             u.battle_fitness=0
+            print(u.battle_fitness)
         for h in battle_players:
             for k in battle_players:
                 h.simulate2(k)
