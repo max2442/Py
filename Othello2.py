@@ -576,7 +576,7 @@ class Play:
 
     def thread_reproduce(self,parent1,parent2,mutation):
         threads = list()
-        for index in range(8):
+        for index in range(2):
             x = threading.Thread(target=self.reproduce, args=(parent1,parent2,mutation))
             threads.append(x)
             x.start()
@@ -628,7 +628,7 @@ class Play:
         battle_players = []
         num = 0
         save = None
-        for c in range(50):
+        for c in range(20):
             io = Othello_Player()
             io.simulate()
             io.simulate3()
@@ -651,6 +651,7 @@ class Play:
             #print(player_list)
             print(player_list[0][2])
             print(player_list[0][3])
+            print(player_list[0][1])
             #if (num+1)%20 ==0:
                 #save=player_list[0][2]
             for g in range(0,10,2):
