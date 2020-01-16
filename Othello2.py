@@ -653,7 +653,7 @@ class Play:
 #             t = time.perf_counter()
             print(num)
             player_list = sorted(player_list,reverse=True)
-            if (num+1)%30==0:
+            if (num+1)%100==0:
                 self.print_weights(player_list)
             if previous_value == player_list[0][0]:
                 count_in_a_row += 1
