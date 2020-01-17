@@ -583,9 +583,9 @@ class Play:
             x.join()
 
     def multi_simulation(self,oth):
-        oth.simulate()
-        oth.simulate3()
-        self.sim_list.append((oth.fitness + oth.fitness2,oth.battle_fitness, oth.fitness, oth.fitness2, random.random(), oth))
+        #oth.simulate()
+        #oth.simulate3()
+        self.sim_list.append((oth.battle_fitness, random.random(), oth))
 
     def thread_simulation(self,born_players):
         threads = list()
@@ -620,34 +620,32 @@ class Play:
     
     def print_weights(self,player_list):
         sample = open('weightfile.txt', 'w')
-        print(player_list[0][2], file=sample)
-        print(player_list[0][3], file=sample)
-        print(player_list[0][1], file=sample)
-        print(player_list[0][5].weight1, file=sample)
-        print(player_list[0][5].weight2, file=sample)
-        print(player_list[0][5].weight3, file=sample)
-        print(player_list[0][5].bias1, file=sample)
-        print(player_list[0][5].bias2, file=sample)
-        print(player_list[0][5].bias3, file=sample)
+#         print(player_list[0][2], file=sample)
+#         print(player_list[0][3], file=sample)
+        print(player_list[0][0], file=sample)
+        print(player_list[0][2].weight1, file=sample)
+        print(player_list[0][2].weight2, file=sample)
+        print(player_list[0][2].weight3, file=sample)
+        print(player_list[0][2].bias1, file=sample)
+        print(player_list[0][2].bias2, file=sample)
+        print(player_list[0][2].bias3, file=sample)
         print("\n",file=sample)
     
     def evolve(self,b):
         player_list = []
         born_players =[]
         born_players2 =[]
-        previous_value = 0
-        count_in_a_row = 0
-        mutation = .8
+        #previous_value = 0
+        #count_in_a_row = 0
+        mutation = .7
         battle_players = []
         num = 0
         save = None
         for c in range(20):
             io = Othello_Player()
-            io.simulate()
-            io.simulate3()
             #print(io.fitness)
-            player_list.append((io.fitness+io.fitness2,random.random(),io.fitness,io.fitness2,random.random(),io))
-        previous_value = player_list[0][0]
+            player_list.append((random.random(),random.random(),io))
+        #previous_value = player_list[0][0]
         #print()
         while num<b:
 #             t = time.perf_counter()
@@ -655,27 +653,27 @@ class Play:
             player_list = sorted(player_list,reverse=True)
             if (num+1)%200==0:
                 self.print_weights(player_list)
-            if previous_value == player_list[0][0]:
-                count_in_a_row += 1
-            else:
-                count_in_a_row = 0
-                mutation = .8
-                previous_value = player_list[0][0]
-            if count_in_a_row >= 10:
-                mutation = .3
+#             if previous_value == player_list[0][0]:
+#                 count_in_a_row += 1
+#             else:
+#                 count_in_a_row = 0
+#                 mutation = .8
+#                 previous_value = player_list[0][0]
+#             if count_in_a_row >= 10:
+#                 mutation = .3
             #print(player_list)
-            print(player_list[0][2])
-            print(player_list[0][3])
-            print(player_list[0][1])
+            #print(player_list[0][1])
+            #print(player_list[0][2])
+            print(player_list[0][0])
             #if (num+1)%20 ==0:
                 #save=player_list[0][2]
             for g in range(0,10,2):
-                battle_players.append(player_list[g][5])
-                battle_players.append(player_list[g+1][5])
+                battle_players.append(player_list[g][2])
+                battle_players.append(player_list[g+1][2])
                 self.g_list=[]
-                born_players2.append(player_list[g][5])
-                born_players2.append(player_list[g+1][5])
-                self.thread_reproduce(player_list[g][5],player_list[g+1][5],mutation)
+                born_players2.append(player_list[g][2])
+                born_players2.append(player_list[g+1][2])
+                self.thread_reproduce(player_list[g][2],player_list[g+1][2],mutation)
                 born_players = self.g_list#reproduce(player_list[g][4],player_list[g+1][4])
                 for h in born_players:
                     born_players2.append(h)
