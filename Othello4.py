@@ -619,7 +619,7 @@ class Play:
 #         player1.simulate2(player2)
     
     def print_weights(self,player_list):
-        sample = open('weightfile.txt', 'w')
+        sample = open('weightfile2.txt', 'w')
 #         print(player_list[0][2], file=sample)
 #         print(player_list[0][3], file=sample)
         print(player_list[0][0], file=sample)
